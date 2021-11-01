@@ -1,22 +1,12 @@
 require('dotenv').config();
-// const mongoose = require('mongoose');
-// const setupMongooseDB = require('./setupMongooseDB');
 const getCoinsFromKuCoin = require('./utils/getCoins');
-// const getCoinsFromDatabase = require('./utils/getCoinsFromDatabase');
-// const sortCoinsByApy = require('./utils/sortCoinsByApy');
 const getDifference = require('./utils/getDifference');
-// const addCoinsToDB = require('./utils/addCoinsToDB');
-// const getExtendedCoins = require('./utils/getExtendedCoins');
-// const mapCoinsName = require('./utils/mapCoinsName');
-// const sendEmail = require('./sendEmail');
 const getCoinsNames = require('./utils/getCoinsNames');
 const setupDB = require('./utils/setupMogngoDB');
-
-
+const sendEmail = require('./utils/sendEmail');
 
 const client = setupDB();
 
-const mockCurreentCoins = ['CSP', 'LOKI', 'NRG', 'FET', 'XMR', 'DICK'];
 const main = async () => {
   try {
     await client.connect();
@@ -27,33 +17,32 @@ const main = async () => {
 
     // get coins from database
     const cursor = await coinsCollection.find().sort({ _id: -1 }).limit(1);
-    const coinsFromDataBase = await cursor.toArray();
+    const [{ coins: coinsFromDataBase }] = await cursor.toArray();
     console.log(`✅ Found ${coinsFromDataBase.length} coins in DB`);
 
-    const response = await getCoinsFromKuCoin();
-    const coinsFromKuCoin = getCoinsNames(response);
-    console.log(`✅ Found ${coinsFromKuCoin.length} coins in KuCoin`);
+    // get coins from KuCoin
+    const coinsFromKuCoin = await getCoinsFromKuCoin();
+    const kuCoinCoinsNames = getCoinsNames(coinsFromKuCoin);
+    console.log(`✅ Found ${kuCoinCoinsNames.length} coins in KuCoin`);
 
-    const diff = getDifference(mockCurreentCoins, coinsFromKuCoin);
-    console.log('diff', diff);
+    const diff = getDifference(kuCoinCoinsNames, coinsFromDataBase);
+    console.log(`✅ Found ${diff.length} new coins in KuCoin`);
 
+    if (diff.length) {
+      // here should be diff coins instead mockCurreentCoins
+      const newCoins = coinsFromKuCoin.filter(coin =>
+        diff.find(coinName => coinName === coin.currency)
+      );
+      console.log('👀', newCoins);
+      await sendEmail(newCoins);
+      console.log(`✅ Email has been sent`);
 
-//     const doc = { coins: mockCurreentCoins };
-// const result = await coinsCollection.insertOne(doc);
-// console.log(
-//    `A document was inserted with the _id: ${result.insertedId}`,
-// );
-
-
-
-
-
-
-    // const res = await getCoinsFromKuCoin();
-    // console.log('res', getCoinsNames(res));
-    // console.log('diff', getDifference(mockCurreentCoins, getCoinsNames(res)));
+      const doc = { coins: kuCoinCoinsNames };
+      await coinsCollection.insertOne(doc);
+      console.log(`✅ Coins have been added successfully to database`);
+    }
   } catch (error) {
-    console.log('🔴', error);
+    console.error('🔴', error);
   } finally {
     await client.close();
   }
