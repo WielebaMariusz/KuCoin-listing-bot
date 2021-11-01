@@ -7,7 +7,7 @@ const sendEmail = require('./utils/sendEmail');
 
 const client = setupDB();
 
-const main = async () => {
+async function main() {
   try {
     await client.connect();
     console.log('✅ Database connection success.');
@@ -46,6 +46,4 @@ const main = async () => {
   } finally {
     await client.close();
   }
-};
-
-main();
+}
