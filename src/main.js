@@ -1,4 +1,3 @@
-require('dotenv').config();
 const getCoinsFromKuCoin = require('./utils/getCoins');
 const getDifference = require('./utils/getDifference');
 const getCoinsNames = require('./utils/getCoinsNames');
