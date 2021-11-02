@@ -33,7 +33,7 @@ async function main() {
         diff.find(coinName => coinName === coin.currency)
       );
       console.log('👀', newCoins);
-      await sendEmail(newCoins);
+      // await sendEmail(newCoins);
       console.log(`✅ Email has been sent`);
 
       const doc = { coins: kuCoinCoinsNames };
@@ -46,3 +46,5 @@ async function main() {
     await client.close();
   }
 }
+
+module.exports = main;

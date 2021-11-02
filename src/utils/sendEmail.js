@@ -15,7 +15,7 @@ module.exports = async function sendEmail(coins) {
   const info = await transporter.sendMail({
     from: '"KuCoin bot" <crypto.russ.hanneman@gmail.com>',
     to: 'mariusz0689@gmail.com',
-    // bcc: process.env.RECIPIENTS,
+    bcc: process.env.RECIPIENTS,
     subject: `🤑  New  ${coins.length} ${coins.length > 1 ? 'coins' : 'coin'} on KuCoin 🤑`,
     html: getEmailTemplate(coins)
   });
