@@ -1,8 +1,12 @@
-const getCoinsFromKuCoin = require('./utils/getCoins');
+const getCoinsFromKuCoin = require('./coinGecko/helpers/getCoins');
 const getDifference = require('./utils/getDifference');
 const getCoinsNames = require('./utils/getCoinsNames');
 const setupDB = require('./utils/setupMogngoDB');
 const sendEmail = require('./utils/sendEmail');
+const getCoinGeckoInfo = require('./coinGecko/getCoinGeckoInfo');
+const concatCoinsInfo = require('./coinGecko/helpers/concatCoinsInfo');
+
+require('dotenv').config();
 
 const client = setupDB();
 
@@ -29,13 +33,19 @@ async function main() {
 
     if (diff.length) {
       // here should be diff coins instead mockCurreentCoins
-      const newCoins = coinsFromKuCoin.filter(coin =>
-        diff.find(coinName => coinName === coin.currency)
+      const newCoinsKuCoin = coinsFromKuCoin.filter(coin =>
+        diff.find(coinName => coinName === coin.currency.market.name)
       );
-      console.log('👀', newCoins);
-      // await sendEmail(newCoins);
-      console.log(`✅ Email has been sent`);
 
+      const coingeckoCoins = await getCoinGeckoInfo(diff);
+
+      let shippingTokens = newCoinsKuCoin;
+      if (coingeckoCoins) {
+        shippingTokens = concatCoinsInfo(newCoinsKuCoin, coingeckoCoins);
+      }
+
+      await sendEmail(shippingTokens);
+      console.log(`✅ Email has been sent`);
       const doc = { coins: kuCoinCoinsNames };
       await coinsCollection.insertOne(doc);
       console.log(`✅ Coins have been added successfully to database`);
@@ -46,5 +56,7 @@ async function main() {
     await client.close();
   }
 }
+
+main();
 
 module.exports = main;
