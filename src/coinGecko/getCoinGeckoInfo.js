@@ -9,7 +9,7 @@ async function getCoinGeckoInfo(coins) {
     const matchedCoins = coinGeckoCoinsList.filter(coin =>
       coins.find(
         coinSymbol =>
-          coinSymbol.toLocaleLowerCase() === coin.symbol && !coin.id.includes('binance-peg')
+          coinSymbol.toLocaleLowerCase() === coin.symbol.toLocaleLowerCase() && !coin.id.includes('binance-peg')
       )
     );
     console.log('matchedCoins', matchedCoins)
@@ -24,12 +24,13 @@ async function getCoinGeckoInfo(coins) {
     });
 
     const responses = await Promise.all(promises);
-    return responses.map(response => {
-      const exchanges = coinGeckoResponseFormatter(response)
+    return responses.map((response, index) => {
+      const originalCoinSymbol = matchedCoins[index]?.symbol
+      const exchanges = coinGeckoResponseFormatter(response, originalCoinSymbol)
       const [firstExchage] = exchanges;
 
       return {
-        currency: firstExchage.currency,
+        currency: firstExchage?.currency,
         exchanges
       }
     });

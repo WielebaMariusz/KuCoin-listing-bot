@@ -1,6 +1,6 @@
-const coinGeckoResponseFormatter = response => {
+const coinGeckoResponseFormatter = (response, originalCoinSymbol) => {
   return response.tickers.map(coin => ({
-    currency: coin.base,
+    currency: originalCoinSymbol,
     exchange: coin.market.name,
     pair: `${coin.base}-${coin.target}`,
     price: coin.converted_last.usd,

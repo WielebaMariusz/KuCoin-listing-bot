@@ -16,7 +16,7 @@ module.exports = async function sendEmail(coins) {
     from: '"KuCoin bot" <crypto.russ.hanneman@gmail.com>',
     to: 'mariusz0689@gmail.com',
     bcc: process.env.RECIPIENTS,
-    subject: `🤑  New  ${coins.length} ${coins.length > 1 ? 'coins' : 'coin'} on KuCoin 🤑`,
+    subject: `🤑  New  ${coins.length} ${coins.length > 1 ? 'coins' : 'coin'} on KuCoin at ${new Date().toLocaleString()} 🤑`,
     html: getEmailTemplate(coins)
   });
 
