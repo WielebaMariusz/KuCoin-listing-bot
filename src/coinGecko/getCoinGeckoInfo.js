@@ -12,7 +12,6 @@ async function getCoinGeckoInfo(coins) {
           coinSymbol.toLocaleLowerCase() === coin.symbol.toLocaleLowerCase() && !coin.id.includes('binance-peg')
       )
     );
-    console.log('matchedCoins', matchedCoins)
 
     if (!matchedCoins.length) {
       return null;

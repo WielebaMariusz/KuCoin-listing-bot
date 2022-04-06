@@ -8,7 +8,7 @@ const getCoinGeckoInfo = require('./coinGecko/getCoinGeckoInfo');
 const concatCoinsInfo = require('./coinGecko/helpers/concatCoinsInfo');
 
 // this is only for local testing purposes
-require('dotenv').config();
+// require('dotenv').config();
 
 const client = setupDB();
 
@@ -39,17 +39,17 @@ async function main() {
         diff.find(coinName => coinName === coin.currency)
       );
 
-      await sendTestEmail(newCoinsKuCoin)
+      // await sendTestEmail(newCoinsKuCoin);
 
-      const coingeckoCoins = await getCoinGeckoInfo(diff);
-      console.log(`✅ Coingecko request`);
+      // const coingeckoCoins = await getCoinGeckoInfo(diff);
+      // console.log(`✅ Coingecko request`);
 
       let shippingTokens = newCoinsKuCoin;
-      if (coingeckoCoins) {
-        console.log(`✅ Coingecko coins have been found`);
-        shippingTokens = concatCoinsInfo(newCoinsKuCoin, coingeckoCoins);
-        console.log('shippingTokens', shippingTokens)
-      }
+      // if (coingeckoCoins) {
+      //   console.log(`✅ Coingecko coins have been found`);
+      //   shippingTokens = concatCoinsInfo(newCoinsKuCoin, coingeckoCoins);
+      //   console.log('shippingTokens', shippingTokens);
+      // }
 
       await sendEmail(shippingTokens);
       console.log(`✅ Email has been sent`);
